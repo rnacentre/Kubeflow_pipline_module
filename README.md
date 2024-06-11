@@ -132,7 +132,7 @@ git checkout v1.7.0
 ```bash
 while ! kustomize build example | kubectl apply -f -; do echo "Retrying to apply resources"; sleep 20; done
 ```
-Here I use k9s as a deployment monitor
+Wait for all pods to run successfully
 
 **Kubeflow Start!!!**
 ```bash
