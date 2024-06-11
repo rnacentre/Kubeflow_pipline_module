@@ -133,6 +133,7 @@ git checkout v1.7.0
 while ! kustomize build example | kubectl apply -f -; do echo "Retrying to apply resources"; sleep 20; done
 ```
 Wait for all pods to run successfully
+[_Attatchment/Screenshot 2024-06-06 at 17.11.13.png](https://github.com/OOAAHH/Kubeflow_pipline_module/blob/main/_Attatchment/Screenshot%202024-06-06%20at%2017.11.13.png)
 
 **Kubeflow Start!!!**
 ```bash
