@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: cellranger-analysis-pipeline-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.6.3, pipelines.kubeflow.org/pipeline_compilation_time: '2024-06-11T06:36:38.421293',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "Pipeline to process single-cell
+      data using CellRanger", "inputs": [{"name": "fastq_dir", "type": "String"},
+      {"name": "sample_name", "type": "String"}, {"name": "transcriptome", "type":
+      "String"}, {"name": "output_dir", "type": "String"}], "name": "CellRanger Analysis
+      Pipeline"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.6.3}
+spec:
+  entrypoint: cellranger-analysis-pipeline
+  templates:
+  - name: cellranger-analysis-pipeline
+    inputs:
+      parameters:
+      - {name: fastq_dir}
+      - {name: output_dir}
+      - {name: sample_name}
+      - {name: transcriptome}
+    dag:
+      tasks:
+      - name: cellranger-count
+        template: cellranger-count
+        arguments:
+          parameters:
+          - {name: fastq_dir, value: '{{inputs.parameters.fastq_dir}}'}
+          - {name: output_dir, value: '{{inputs.parameters.output_dir}}'}
+          - {name: sample_name, value: '{{inputs.parameters.sample_name}}'}
+          - {name: transcriptome, value: '{{inputs.parameters.transcriptome}}'}
+  - name: cellranger-count
+    container:
+      args: ['--id={{inputs.parameters.sample_name}}', '--transcriptome={{inputs.parameters.transcriptome}}',
+        '--fastqs={{inputs.parameters.fastq_dir}}', --localcores=8, --localmem=64,
+        '--output-dir={{inputs.parameters.output_dir}}']
+      command: [cellranger, count]
+      image: nfcore/cellranger:7.2.0
+      volumeMounts:
+      - {mountPath: /home/sunhao, name: pvolume-8e0d183fecc7df9bc66293a505c5cd5f70f1fb0b08cafd74954c04c}
+    inputs:
+      parameters:
+      - {name: fastq_dir}
+      - {name: output_dir}
+      - {name: sample_name}
+      - {name: transcriptome}
+    metadata:
+      labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.6.3, pipelines.kubeflow.org/pipeline-sdk-type: kfp}
+    volumes:
+    - name: pvolume-8e0d183fecc7df9bc66293a505c5cd5f70f1fb0b08cafd74954c04c
+      persistentVolumeClaim: {claimName: hostpath-pvc}
+  arguments:
+    parameters:
+    - {name: fastq_dir}
+    - {name: sample_name}
+    - {name: transcriptome}
+    - {name: output_dir}
+  serviceAccountName: pipeline-runner
