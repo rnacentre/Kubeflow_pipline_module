@@ -9,3 +9,7 @@ soon
 # Update
 ## 2024/06/11
 Add pv and pvc for local path test
+
+# Useage
+- cli 
+`kfp run --experiment my-experiment --pipeline-file cellranger_pipeline.yaml --parameter fastq_dir=/home/localpath --parameter sample_name=sample123 --parameter transcriptome=/home/localpath --parameter output_dir=/home/localpath`
