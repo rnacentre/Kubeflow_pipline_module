@@ -69,3 +69,72 @@ kfp run --experiment my-experiment --pipeline-file cellranger_pipeline.yaml \
         --parameter transcriptome=/home/localpath \
         --parameter output_dir=/home/localpath
 ```
+
+
+# Attachment
+First prepare your image file: [example](https://github.com/v-wan/k3d-gpu)
+
+### Docker images
+```bash
+who@oem:~$ docker images
+REPOSITORY                         TAG                 IMAGE ID       CREATED        SIZE
+vlatitude/k3d-gpu/rancher/k3s      v1.26.4-k3s1-cuda   5ebcdf68ea83   5 days ago     533MB
+ghcr.io/k3d-io/k3d-tools           5.6.3               3e61fe13415d   2 months ago   20.2MB
+ghcr.io/k3d-io/k3d-proxy           5.6.3               2f9ac4724f73   2 months ago   61.2MB
+```
+### Installation dependency
+We use [k3d](https://k3d.io/v5.6.3/) as k8s foundation.
+
+### Create you cluster
+#### Create you cluster
+```bash
+k3d cluster create "kubeflow" \
+  --image "vlatitude/k3d-gpu/rancher/k3s:v1.26.4-k3s1-cuda" \
+  --gpus all
+```
+#### Install NVDIA gpu support
+```bash
+kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.15.0/deployments/static/nvidia-device-plugin.yml
+```
+or You could test with this pods:
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod
+spec:
+  restartPolicy: Never
+  containers:
+    - name: cuda-container
+      image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda10.2
+      resources:
+        limits:
+          nvidia.com/gpu: 1 # requesting 1 GPU
+  tolerations:
+  - key: nvidia.com/gpu
+    operator: Exists
+    effect: NoSchedule
+EOF
+```
+
+### Deploy the kubeflow
+```bash
+git clone -b https://github.com/kubeflow/manifests
+```
+#### You can choose the version you like
+```bash
+git checkout v1.7.0
+```
+#### You can install all Kubeflow official components (residing under apps) and all common services (residing under common) using the following command:
+- Be aware of **kustomize** compatibility issues
+
+```bash
+while ! kustomize build example | kubectl apply -f -; do echo "Retrying to apply resources"; sleep 20; done
+```
+Here I use k9s as a deployment monitor
+
+**Kubeflow Start!!!**
+```bash
+kubectl port-forward svc/istio-ingressgateway -n istio-system 12345:80
+```
