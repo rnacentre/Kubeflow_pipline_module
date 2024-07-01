@@ -4,7 +4,7 @@ Kubeflow_pipline_module, use docker as base component.
 - [Development mode](https://github.com/OOAAHH/Kubeflow_pipline_module/edit/main/README.md#development-mode)
 - [Sketch](https://github.com/OOAAHH/Kubeflow_pipline_module/edit/main/README.md#sketch)
 - [Update](https://github.com/OOAAHH/Kubeflow_pipline_module/edit/main/README.md#Update)
-- [Example](https://github.com/OOAAHH/Kubeflow_pipline_module/edit/main/README.md#example)
+- [Example](https://github.com/rnacentre/Kubeflow_pipline_module?tab=readme-ov-file#example)
 - [Useage](https://github.com/OOAAHH/Kubeflow_pipline_module/edit/main/README.md#useage)
 
 # Development mode
